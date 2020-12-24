@@ -1,0 +1,12 @@
+*.log
+*.pid
+
+.built
+.DS_Store
+.vercel
+.vscode
+
+npm-debug.log
+
+built
+node_modules
