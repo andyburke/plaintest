@@ -46,17 +46,19 @@ module.exports = {
 		return group;
 	},
 
-	run: async function() {
+	run: async function( group_name ) {
+
+		const testable_groups = group_name ? groups.filter(group => group.name === group_name) : groups
 
 		let count = 0;
 		let failed = 0;
 
-		const total_tests = groups.reduce( ( _total_tests, group ) => ( _total_tests + group.tests.length ), 0 );
+		const total_tests = testable_groups.reduce( ( _total_tests, group ) => ( _total_tests + group.tests.length ), 0 );
 
 		console.log( `# ${ headline }` );
 		console.log( `1..${ total_tests }` );
 
-		for ( const group of groups ) {
+		for ( const group of testable_groups ) {
 
 			if ( !group.tests.length ) {
 				continue;
