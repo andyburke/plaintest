@@ -19,6 +19,21 @@ group_two.test( 'multiple groups are supported', () => {
 	assert.ok( true );
 } );
 
+const group_to_skip = plaintest.group( 'skip this group' );
+group_to_skip.test( 'skipped group tests should not run', () => {
+	assert.ok( false );
+} );
+
+const group_to_skip_with_common_filter = plaintest.group( 'skip by common filter' );
+group_to_skip_with_common_filter.test( 'skipped group tests should not run', () => {
+	assert.ok( false );
+} );
+
+const solo_group = plaintest.group( 'solo group' );
+solo_group.test( 'should be ok to run this group', () => {
+	assert.ok( true );
+} );
+
 let before_each_count = 0;
 const group_before_each = plaintest.group( 'group with before each' );
 group_before_each.before.each.push( () => {
@@ -80,7 +95,26 @@ plaintest.test( 'later tests are added to the last group created', () => {
 } );
 
 ( async function() {
-	await plaintest.run();
+	await plaintest.run( {
+		filter: ( group ) => ( !/skip/i.test( group.name ) )
+	} );
 
 	assert.strictEqual( after_all_count, 1 );
+
+	before_all_count = 0;
+	after_all_count = 0;
+	before_each_count = 0;
+	after_each_count = 0;
+	await plaintest.run( {
+		filter: plaintest.filters.skip_group_names( [ 'skip this group', 'skip by common filter' ] )
+	} );
+
+	before_all_count = 0;
+	after_all_count = 0;
+	before_each_count = 0;
+	after_each_count = 0;
+	await plaintest.run( {
+		filter: plaintest.filters.group_name( 'solo group' )
+	} );
+
 } )();

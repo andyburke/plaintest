@@ -46,17 +46,21 @@ module.exports = {
 		return group;
 	},
 
-	run: async function() {
+	run: async function( {
+		filter = () => true
+	} = {} ) {
 
 		let count = 0;
 		let failed = 0;
 
-		const total_tests = groups.reduce( ( _total_tests, group ) => ( _total_tests + group.tests.length ), 0 );
-
 		console.log( `# ${ headline }` );
+
+		const filtered_groups = groups.filter( filter );
+		const total_tests = filtered_groups.reduce( ( _total_tests, group ) => ( _total_tests + group.tests.length ), 0 );
+
 		console.log( `1..${ total_tests }` );
 
-		for ( const group of groups ) {
+		for ( const group of filtered_groups ) {
 
 			if ( !group.tests.length ) {
 				continue;
@@ -98,5 +102,10 @@ module.exports = {
 		}
 
 		return failed === 0;
+	},
+
+	filters: {
+		group_name: ( name ) => ( ( group ) => ( group.name === name ) ),
+		skip_group_names: ( names ) => ( ( group ) => ( !names.includes( group.name ) ) )
 	}
 };
